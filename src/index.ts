@@ -8,6 +8,8 @@ import { adminRoutes, vendorRoutes } from './routes';
 import ApiError from './utility/ApiError';
 import mongoSanitize from 'express-mongo-sanitize';
 import { globalError } from './middleware/error';
+import { dbConnection } from './utility/dbConnection';
+import mongoose from 'mongoose';
 
 dotenv.config({ path: '../config.env' });
 
@@ -31,13 +33,23 @@ app.all('*', (req: Request, res: Response, next: NextFunction) => {
 // error handler middleware
 app.use(globalError);
 
-//   await dbConnection();
+// db connection
+dbConnection();
 
-//   await App(app);
-
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Listening to port ${PORT}`);
 });
 // };
 
-// StartServer();
+// handle rejections (errors from outside express)
+
+process.on('unhandledRejection', (err: ApiError) => {
+  console.error(
+    `unhandledRejection Error happened: ${err.name} | ${err.message}`
+  );
+
+  server.close(err => {
+    console.log('server is shutting down...');
+    process.exit(1);
+  });
+});
