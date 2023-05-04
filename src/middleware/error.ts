@@ -1,5 +1,5 @@
 import fs from 'fs';
-import ApiError from '../utility/ApiError';
+import { apiError } from '../utility/ApiError';
 import { Request, NextFunction, Response } from 'express';
 
 // export interface Error {
@@ -11,7 +11,7 @@ import { Request, NextFunction, Response } from 'express';
 // }
 
 // شكل الايرور اللي عايزه يرجع ف الرسبونس لو انا شغال ف الديفلوبمنت كباك
-const errorForDev = (err: ApiError, res: Response) => {
+const errorForDev = (err: apiError, res: Response) => {
   return res.status(err.statusCode).json({
     status: err.status,
     message: err.message,
@@ -22,21 +22,15 @@ const errorForDev = (err: ApiError, res: Response) => {
 
 // لما اخلص المشروع دا شكل الداتا اللي المفروض هترجع للفرونت
 
-const errorForProd = (err: ApiError, res: Response) => {
+const errorForProd = (err: apiError, res: Response) => {
   return res.status(err.statusCode).json({
     status: err.status,
     message: err.message,
   });
 };
 
-const handleTokenInvalid = () =>
-  new ApiError('Invalid token, please login and try again', 401);
-
-const handleTokenExpired = () =>
-  new ApiError('Token expired, please login and try again', 401);
-
 export const globalError = (
-  err: ApiError,
+  err: apiError,
   req: Request,
   res: Response,
   next: NextFunction
@@ -44,8 +38,14 @@ export const globalError = (
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
 
-  if (err.name === 'JsonWebTokenError') err = handleTokenInvalid();
-  if (err.name === 'TokenExpiredError') err = handleTokenExpired();
+  if (err.name === 'JsonWebTokenError') {
+    err.statusCode = 401;
+    err.message = 'Invalid token, please login and try again';
+  }
+  if (err.name === 'TokenExpiredError') {
+    err.statusCode = 401;
+    err.message = 'Token expired, please login and try again';
+  }
 
   // if (req.file)
   //   fs.unlink(req.file?.path, err => {

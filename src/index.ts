@@ -10,20 +10,19 @@ dotenv.config({ path: '../config.env' });
 
 const app = express();
 
-// error handler middleware
-app.use(globalError);
-
 // db connection
 dbConnection();
 
 // routes handler
 appRoutes(app);
 
+// error handler middleware
+app.use(globalError);
+
 // connect to server
 const server = app.listen(PORT, () => {
   console.log(`Listening to port ${PORT}`);
 });
-// };
 
 // handle rejections (errors from outside express)
 

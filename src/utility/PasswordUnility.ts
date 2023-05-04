@@ -1,10 +1,19 @@
 import bcrypt from 'bcrypt';
 import { Request } from 'express';
-// import jwt from 'jsonwebtoken';
-import { APP_SECRET } from '../config';
+import jwt from 'jsonwebtoken';
+import { JWT_SECRET, JWT_SECRET_EXPIRATION } from '../config';
+import { tokenInput } from '../dto';
 
 // import { VendorPayload } from '../dto';
 // import { AuthPayload } from '../dto/Auth.dto';
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: tokenInput;
+    }
+  }
+}
 
 export const GenerateSalt = async () => {
   return await bcrypt.genSalt();
@@ -22,25 +31,25 @@ export const ValidatePassword = async (
   return (await GeneratePassword(enteredPassword, salt)) === savedPassword;
 };
 
-// export const GenerateSignature = async (payload: AuthPayload) => {
+export const GenerateToken = (payload: tokenInput) => {
+  return jwt.sign(payload, JWT_SECRET, {
+    expiresIn: JWT_SECRET_EXPIRATION,
+  });
+};
 
-//    return jwt.sign(payload, APP_SECRET, { expiresIn: '90d'});
+export const ValidateToken = (req: Request) => {
+  // will be bearer token
+  const token = req.get('Authorization');
 
-// }
-
-// export const ValidateSignature  = async(req: Request) => {
-
-//     const signature = req.get('Authorization');
-
-//     if(signature){
-//         try {
-//             const payload = await jwt.verify(signature.split(' ')[1], APP_SECRET) as AuthPayload;
-//             req.user = payload;
-//             return true;
-
-//         } catch(err){
-//             return false
-//         }
-//     }
-//     return false
-// };
+  if (token) {
+    try {
+      const payload = jwt.verify(token.split(' ')[1], JWT_SECRET) as tokenInput;
+      req.user = payload;
+      //   console.log(payload);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+  return false;
+};

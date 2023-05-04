@@ -1,3 +1,8 @@
+export interface apiError extends Error {
+  statusCode: number;
+  status: string;
+  isOperational: boolean;
+}
 class ApiError extends Error {
   constructor(message: string, statusCode = 500) {
     super(message);
@@ -6,9 +11,9 @@ class ApiError extends Error {
     this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
     this.isOperational = true;
   }
-  statusCode: number;
-  status: string;
-  isOperational: boolean;
+  private statusCode: number;
+  private status: string;
+  private isOperational: boolean;
 }
 
 export default ApiError;

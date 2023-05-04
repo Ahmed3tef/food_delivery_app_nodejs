@@ -13,3 +13,13 @@ export interface loginInput {
   email: string;
   password: string;
 }
+export interface tokenInput {
+  id: string;
+  email: string;
+}
+export interface EditVendorInput {
+  name: string;
+  address: string;
+  foodType: [string];
+  phone: string;
+}

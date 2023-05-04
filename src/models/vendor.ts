@@ -1,13 +1,22 @@
-import mongoose, { Schema, model } from 'mongoose';
+import { Document, Schema, SchemaTypes, model } from 'mongoose';
 import { createVendorInput } from '../dto';
 
-interface vendorDoc extends createVendorInput {
+interface vendorDoc extends Document {
+  name: string;
+  ownerName: string;
+  foodType: [string];
+  pincode: string;
+  address: string;
+  phone: string;
+  email: string;
+  password: string;
+  logo: string;
   salt: string;
   serviceAvailable: boolean;
   coverImages: [string];
   rating: number;
-  // foods: any;
-  logo: string;
+  deliveryTime: number;
+  dishes: any;
 }
 
 const vendorSchema = new Schema(
@@ -60,10 +69,17 @@ const vendorSchema = new Schema(
       type: Number,
       default: 0,
     },
-    // foods: {
-    //   type: mongoose.SchemaTypes.ObjectId,
-    //   ref: 'food',
-    // },
+    deliveryTime: {
+      // in mins
+      type: Number,
+      default: 10,
+    },
+    dishes: [
+      {
+        type: SchemaTypes.ObjectId,
+        ref: 'dish',
+      },
+    ],
     logo: {
       type: String,
       required: true,
