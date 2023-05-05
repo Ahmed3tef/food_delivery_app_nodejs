@@ -23,3 +23,13 @@ export interface EditVendorInput {
   foodType: [string];
   phone: string;
 }
+
+export interface CreateDishInput {
+  name: string;
+  description: string;
+  categoryId: string;
+  vendorId: string;
+  foodType: string;
+  readyTime: string;
+  price: number;
+}
